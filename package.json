@@ -1,22 +1,33 @@
 {
-  "name": "tracker-frontend-nextjs",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "19.0.0-rc-f994737d14-20240522",
-    "react-dom": "19.0.0-rc-f994737d14-20240522",
-    "next": "15.0.0-rc.0"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18"
-  }
+	"name": "tracker-frontend-nextjs",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbo",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@ark-ui/react": "^3.3.0",
+		"chart.js": "^4.4.3",
+		"luxon": "^3.4.4",
+		"next": "15.0.0-rc.0",
+		"react": "19.0.0-rc-f994737d14-20240522",
+		"react-chartjs-2": "^5.2.0",
+		"react-dom": "19.0.0-rc-f994737d14-20240522",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.1",
+		"@pandacss/dev": "^0.40.1",
+		"@types/luxon": "^3.4.2",
+		"@types/node": "^20",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"babel-plugin-react-compiler": "0.0.0-experimental-938cd9a-20240601",
+		"tsx": "^4.15.5",
+		"typescript": "^5",
+		"vercel": "^34.2.7"
+	}
 }

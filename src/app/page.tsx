@@ -1,95 +1,151 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { getDetails, getValuation } from "@/app/data";
+import { styled } from "@/styled-system/jsx";
+import dynamic from "next/dynamic";
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+const ValuationChart = dynamic(() => import("./_components/chart"), {
+	ssr: false,
+});
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file-text.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+export default async function Home() {
+	const valuation = await getValuation();
+	const details = await getDetails();
+
+	const calculateDiff = (a: number | undefined, b: number | undefined) => {
+		if (a === undefined || b === undefined) {
+			return { diff: undefined, diffPercentage: undefined };
+		}
+		return { diff: a - b, diffPercentage: ((a - b) / b) * 100 };
+	};
+
+	const calculate = () => {
+		const current = valuation[valuation.length - 1]?.value;
+		const previous = valuation[valuation.length - 2]?.value;
+		const deposit = details[details.length - 1]?.value;
+
+		const { diff, diffPercentage } = calculateDiff(current, deposit);
+		const { diff: diffPerDay, diffPercentage: diffPercentagePerDay } =
+			calculateDiff(current, previous);
+
+		return {
+			current,
+			previous,
+			deposit,
+			diff,
+			diffPercentage,
+			diffPerDay,
+			diffPercentagePerDay,
+		};
+	};
+
+	const {
+		current,
+		deposit,
+		diff,
+		diffPercentage,
+		diffPerDay,
+		diffPercentagePerDay,
+	} = calculate();
+
+	const dataAttr = (condition: boolean) => {
+		return condition ? "" : undefined;
+	};
+
+	return (
+		<styled.div
+			display="block grid"
+			justifyContent="center"
+			maxWidth="min(1024px, 100vw)"
+			marginX="auto"
+			marginTop="12"
+			rowGap="10"
+		>
+			<styled.div
+				color="white"
+				display="grid"
+				columnGap="12"
+				rowGap="1"
+				gridTemplateColumns="max-content 1fr"
+				justifyContent="space-between"
+				borderStyle="solid"
+				borderColor="gray.200"
+				borderWidth="1px"
+				borderRadius="lg"
+				paddingY="3"
+				paddingX="6"
+				width="max-content"
+				divideStyle="solid"
+				divideColor="gray.200"
+				divideY="1px"
+				marginX="auto"
+				fontVariantNumeric="tabular-nums"
+			>
+				<styled.div
+					display="grid"
+					gridColumn="-1 / 1"
+					gridTemplateColumns="subgrid"
+				>
+					<styled.div>評価額</styled.div>
+					<styled.div textAlign="right">
+						{current?.toLocaleString()} 円
+					</styled.div>
+				</styled.div>
+
+				<styled.div
+					display="grid"
+					gridColumn="-1 / 1"
+					gridTemplateColumns="subgrid"
+				>
+					<styled.div>前日比</styled.div>
+					<styled.div
+						textAlign="right"
+						data-positive={dataAttr(diffPerDay !== undefined && diffPerDay > 0)}
+						data-negative={dataAttr(diffPerDay !== undefined && diffPerDay < 0)}
+						_positive={{
+							color: "green.500",
+						}}
+						_negative={{
+							color: "red.500",
+						}}
+					>
+						{diffPerDay?.toLocaleString()} 円 / (
+						{diffPercentagePerDay?.toFixed(2)} %)
+					</styled.div>
+				</styled.div>
+
+				<styled.div
+					display="grid"
+					gridColumn="-1 / 1"
+					gridTemplateColumns="subgrid"
+				>
+					<styled.div>入金額</styled.div>
+					<styled.div textAlign="right">
+						{deposit?.toLocaleString()} 円
+					</styled.div>
+				</styled.div>
+
+				<styled.div
+					display="grid"
+					gridColumn="-1 / 1"
+					gridTemplateColumns="subgrid"
+				>
+					<styled.div>差額</styled.div>
+					<styled.div
+						textAlign="right"
+						data-positive={dataAttr(diff !== undefined && diff > 0)}
+						data-negative={dataAttr(diff !== undefined && diff < 0)}
+						_positive={{
+							color: "green.500",
+						}}
+						_negative={{
+							color: "red.500",
+						}}
+					>
+						{diff?.toLocaleString()} 円 / ({diffPercentage?.toFixed(2)} %)
+					</styled.div>
+				</styled.div>
+			</styled.div>
+
+			<ValuationChart data={valuation} />
+		</styled.div>
+	);
 }
