@@ -1,10 +1,12 @@
 import { getDetails, getValuation } from "@/app/data";
 import { styled } from "@/styled-system/jsx";
-import dynamic from "next/dynamic";
+import { default as nextDynamic } from "next/dynamic";
 
-const ValuationChart = dynamic(() => import("./_components/chart"), {
+const ValuationChart = nextDynamic(() => import("./_components/chart"), {
 	ssr: false,
 });
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
 	const valuation = await getValuation();
