@@ -1,92 +1,39 @@
 "use client";
 
-import {
-	CategoryScale,
-	Chart as ChartJS,
-	LineElement,
-	LinearScale,
-	PointElement,
-} from "chart.js";
-import { DateTime } from "luxon";
-import { Line } from "react-chartjs-2";
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 type Props = {
-	data: { date: string; value: number }[];
+  data: { date: string; value: number }[];
 };
 
-const Chart = ({ data }: Props) => {
-	const labels = data.map(({ date }) =>
-		DateTime.fromFormat(date, "yyyyMMddhhmmss").toFormat("yyyy-MM-dd"),
-	);
-
-	return (
-		<Line
-			options={{
-				animation: false,
-				scales: {
-					x: {
-						title: {
-							display: true,
-							text: "日付",
-							color: "white",
-						},
-						ticks: {
-							color: "white",
-							maxRotation: 45,
-							minRotation: 45,
-							callback: (index) => {
-								if (typeof index !== "number") {
-									return undefined;
-								}
-
-								const label = labels[index];
-								if (label === undefined) {
-									return undefined;
-								}
-
-								const date = DateTime.fromFormat(label, "yyyy-MM-dd");
-								if (date.day !== 1) {
-									return undefined;
-								}
-
-								return date.toFormat("yyyy/MM");
-							},
-						},
-						grid: {
-							display: false,
-						},
-					},
-					y: {
-						title: {
-							display: true,
-							text: "評価額",
-							color: "white",
-						},
-						ticks: {
-							color: "white",
-						},
-						grid: {
-							color: "gray",
-							lineWidth: 0.25,
-						},
-					},
-				},
-			}}
-			data={{
-				labels,
-				datasets: [
-					{
-						data: data.map(({ value }) => value),
-						pointStyle: false,
-						borderColor: "#3c74f5",
-						borderWidth: 2,
-					},
-				],
-			}}
-		/>
-	);
+export const ValuationChart = ({ data }: Props) => {
+  return (
+    <LineChart
+      style={{ width: "100%", aspectRatio: 1.618 }}
+      data={data}
+      margin={{
+        top: 20,
+        right: 40,
+        bottom: 40,
+        left: 40,
+      }}
+    >
+      <CartesianGrid stroke="#aaa" strokeDasharray="5 5" />
+      <Line
+        type="monotone"
+        dataKey="value"
+        stroke="black"
+        strokeWidth={3}
+        dot={false}
+        activeDot={false}
+        isAnimationActive={false}
+      />
+      <XAxis dataKey="date" label={{ value: "日付", position: "bottom" }} />
+      <YAxis
+        width="auto"
+        label={{ value: "評価額", position: "insideLeft", angle: -90 }}
+        tickFormatter={(value) => `${(value / 10000).toLocaleString()}万円`}
+      />
+    </LineChart>
+  );
 };
-
-export default Chart;
