@@ -1,6 +1,6 @@
 "use client";
 
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, YAxis } from "recharts";
 
 type Props = {
   data: { date: string; value: number }[];
@@ -12,10 +12,10 @@ export const ValuationChart = ({ data }: Props) => {
       style={{ width: "100%", aspectRatio: 1.618 }}
       data={data}
       margin={{
-        top: 20,
-        right: 40,
-        bottom: 40,
-        left: 40,
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10,
       }}
     >
       <CartesianGrid stroke="#aaa" strokeDasharray="5 5" />
@@ -28,12 +28,7 @@ export const ValuationChart = ({ data }: Props) => {
         activeDot={false}
         isAnimationActive={false}
       />
-      <XAxis dataKey="date" label={{ value: "日付", position: "bottom" }} />
-      <YAxis
-        width="auto"
-        label={{ value: "評価額", position: "insideLeft", angle: -90 }}
-        tickFormatter={(value) => `${(value / 10000).toLocaleString()}万円`}
-      />
+      <YAxis domain={[(min) => min * 0.98, (max) => max * 1.02]} hide />
     </LineChart>
   );
 };

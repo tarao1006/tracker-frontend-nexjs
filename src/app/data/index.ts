@@ -2,8 +2,37 @@ import { DateTime } from "luxon";
 import * as R from "remeda";
 import { z } from "zod";
 
-export const getValuation = async () => {
-  const url = process.env.VALUATION_URL;
+export const getSBIValuation = async () => {
+  const url = process.env.SBI_VALUATION_URL;
+  if (url === undefined) {
+    return [];
+  }
+
+  try {
+    // const data = await readFile("./data/master.jsonl", { encoding: "utf8" });
+
+    const response = await fetch(url);
+    const data = await response.text();
+
+    return R.pipe(
+      data.trim(),
+      (value) => value.split("\n"),
+      R.map((line) => JSON.parse(line.trim())),
+      R.map((line) =>
+        z.object({ date: z.number(), value: z.number() }).parse(line),
+      ),
+      R.map((value) => ({
+        date: DateTime.fromMillis(value.date).toFormat("yyyy-MM-dd"),
+        value: value.value,
+      })),
+    );
+  } catch {
+    return [];
+  }
+};
+
+export const getTsumikiValuation = async () => {
+  const url = process.env.TSUMIKI_VALUATION_URL;
   if (url === undefined) {
     return [];
   }
